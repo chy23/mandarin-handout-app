@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { PenTool, Eraser, Trash2 } from 'lucide-react';
 
 const checkTool = () => document.body.classList.contains('cursor-eraser') || document.body.classList.contains('cursor-pen');
@@ -31,7 +31,61 @@ const BlankWord = ({ text, globalShow }) => {
   );
 }
 
+/* ── 第六課 HTML 表格專用元件 ── */
+const TableContent = ({ html, globalShow }) => {
+  const ref = useRef(null);
+  
+  useEffect(() => {
+    if (!ref.current) return;
+    const blanks = ref.current.querySelectorAll('.table-blank');
+    blanks.forEach(blank => {
+      if (globalShow) {
+        blank.style.color = '#dc2626';
+        blank.style.backgroundColor = '#fef2f2';
+        blank.style.borderColor = '#fca5a5';
+      } else {
+        blank.style.color = 'transparent';
+        blank.style.backgroundColor = '#f1f5f9';
+        blank.style.borderColor = '#94a3b8';
+      }
+    });
+  }, [globalShow]);
+
+  const processedHtml = html.replace(/\*(.*?)\*/g, (_, text) => {
+    return `<span class="table-blank cursor-pointer font-bold transition-colors" style="color: transparent; background-color: #f1f5f9; padding: 0 4px; border-bottom: 3px solid #94a3b8; user-select: none;">${text}</span>`;
+  });
+
+  const handleClick = (e) => {
+    if (checkTool()) return;
+    const blank = e.target.closest('.table-blank');
+    if (blank) {
+      e.stopPropagation();
+      if (blank.style.color === 'transparent') {
+        blank.style.color = '#dc2626';
+        blank.style.backgroundColor = '#fef2f2';
+        blank.style.borderColor = '#fca5a5';
+      } else {
+        blank.style.color = 'transparent';
+        blank.style.backgroundColor = '#f1f5f9';
+        blank.style.borderColor = '#94a3b8';
+      }
+    }
+  };
+
+  return (
+    <div 
+      ref={ref}
+      onClick={handleClick}
+      dangerouslySetInnerHTML={{__html: processedHtml}} 
+    />
+  );
+};
+
+/* ── 解析任務一文字（含 *填空* 與 HTML 表格） ── */
 const parseTask1 = (text, globalShow) => {
+  if (text.includes('<table')) {
+    return <TableContent html={text} globalShow={globalShow} />;
+  }
   const parts = text.split(/\*(.*?)\*/g);
   return parts.map((part, i) => {
     if (i % 2 === 1) {
@@ -99,16 +153,23 @@ const PracticeBlock = ({ index, p, showAllAnswers }) => {
   );
 };
 
+/* ── 造句區塊：整句隱藏，點擊才全部顯示 ── */
 const SentenceBlock = ({ word, ex, showAllAnswers }) => {
   const [showLocal, setShowLocal] = useState(false);
   const isShow = showAllAnswers || showLocal;
+  const cleanText = ex.replace(/[()]/g, '');
   return (
     <div className="mb-6 cursor-pointer select-none group" onClick={(e) => { if (checkTool()) return; setShowLocal(!showLocal); }}>
        <div className="font-bold text-slate-800 mb-2 group-hover:text-blue-700 transition-colors" style={{ marginLeft: '2em' }}>
          <span className="bg-slate-200 px-2 py-1 rounded mr-2 text-sm no-print">造句</span>{word}：
        </div>
-       <div className="leading-relaxed text-slate-800" style={{ marginLeft: '4em' }}>
-         {parsePractice(ex, isShow)}
+       <div className="leading-relaxed" style={{ marginLeft: '4em' }}>
+         <span 
+           className={`inline px-2 font-bold transition-colors border-b-[3px] data-blankword ${isShow ? 'text-red-600 border-red-300 bg-red-50' : 'text-transparent border-slate-400 bg-slate-100'}`}
+           data-text={cleanText}
+         >
+           {cleanText}
+         </span>
        </div>
     </div>
   );
@@ -159,9 +220,24 @@ const Task4MC = ({ q, options, a, showAllAnswers }) => {
 
 export default function HandoutViewer({ lesson }) {
   const [showAllAnswers, setShowAllAnswers] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   const [toolMode, setToolMode] = useState('none');
   const [exportSize, setExportSize] = useState('A4');
   const [exportMargin, setExportMargin] = useState('standard');
+
+  /* ── 切換課文時，重置所有答案狀態 ── */
+  useEffect(() => {
+    setShowAllAnswers(false);
+    setResetKey(k => k + 1);
+  }, [lesson?.id]);
+
+  /* ── 顯示/隱藏全解答：隱藏時一併清除所有個別點擊 ── */
+  const toggleShowAll = () => {
+    if (showAllAnswers) {
+      setResetKey(k => k + 1);
+    }
+    setShowAllAnswers(prev => !prev);
+  };
   
   const isHighlightNode = (node) => {
       if (!node || !node.style) return false;
@@ -228,6 +304,11 @@ export default function HandoutViewer({ lesson }) {
             el.innerHTML = '　';
             el.style.color = '#000'; el.style.background = 'transparent'; el.style.textDecoration = 'none';
         });
+        clone.querySelectorAll('.table-blank').forEach(el => {
+            const len = (el.textContent || '').trim().length;
+            el.innerHTML = '＿'.repeat(len > 0 ? len * 2 : 4);
+            el.style.color = '#000'; el.style.border = 'none'; el.style.background = 'transparent';
+        });
         clone.querySelectorAll('.data-quiz-opt').forEach(el => {
             const icon = el.children[0]; const text = el.children[1];
             if(icon) { icon.innerHTML = '□'; icon.style.color = '#000'; icon.classList.remove('hidden'); }
@@ -253,6 +334,10 @@ export default function HandoutViewer({ lesson }) {
             el.style.color = val === '✓' ? '#DC2626' : '#000'; 
             el.style.fontWeight = val === '✓' ? 'bold' : 'normal';
             el.style.background = 'transparent'; el.style.textDecoration = 'none';
+        });
+        clone.querySelectorAll('.table-blank').forEach(el => {
+            el.style.color = '#DC2626'; el.style.background = 'transparent';
+            el.style.borderBottom = 'none'; el.style.textDecoration = 'underline';
         });
         clone.querySelectorAll('.data-quiz-opt').forEach(el => {
             const isCorrect = el.getAttribute('data-correct') === 'true';
@@ -289,6 +374,8 @@ export default function HandoutViewer({ lesson }) {
         body { font-size: 12pt !important; color: #000000; }
         h1 { font-size: 16pt !important; font-weight: bold; text-align: center; margin-bottom: 24px; }
         h2 { font-size: 14pt !important; font-weight: bold; margin-top: 24px; margin-bottom: 12px; }
+        table { border-collapse: collapse; width: 100%; }
+        td, th { border: 1px solid #94a3b8; padding: 6px 8px; }
       </style>
     </head>
     <body><div class="WordSection1">${clone.innerHTML}</div></body>
@@ -316,8 +403,8 @@ export default function HandoutViewer({ lesson }) {
             <label className="text-sm font-bold text-slate-700 flex items-center">版面：<select className="ml-1 border-slate-300 rounded text-sm p-1" value={exportSize} onChange={e => setExportSize(e.target.value)}><option value="A4">A4</option><option value="B4">B4</option><option value="A3">A3</option></select></label>
             <label className="text-sm font-bold text-slate-700 flex items-center">邊界：<select className="ml-1 border-slate-300 rounded text-sm p-1" value={exportMargin} onChange={e => setExportMargin(e.target.value)}><option value="standard">標準</option><option value="wide">寬</option><option value="narrow">窄</option></select></label>
           </div>
-          <button onClick={() => setShowAllAnswers(!showAllAnswers)} className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm">
-            {showAllAnswers ? '👁️ 隱藏全解答' : '👁️ 顯示全解答'}
+          <button onClick={toggleShowAll} className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm">
+            {showAllAnswers ? '🔒 隱藏全解答' : '👁️ 顯示全解答'}
           </button>
           <button onClick={() => exportToWord('teacher')} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出教用版</button>
           <button onClick={() => exportToWord('student')} className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出學用版</button>
@@ -325,7 +412,8 @@ export default function HandoutViewer({ lesson }) {
       </div>
 
       <div className="flex-1 w-full p-6 flex justify-center">
-        <div id="printable-area" className="w-full max-w-[850px] bg-white p-10 md:p-16 shadow-xl rounded-xl border border-slate-100 content-area">
+        {/* key 含 lesson.id + resetKey，切課或清除答案時強制重建所有子元件 */}
+        <div key={`content-${lesson.id}-${resetKey}`} id="printable-area" className="w-full max-w-[850px] bg-white p-10 md:p-16 shadow-xl rounded-xl border border-slate-100 content-area">
           <h1 className="font-bold text-center mb-12 text-slate-800 whitespace-nowrap overflow-x-auto pb-6 border-b-4 border-slate-300">
             115六上國語學習講義 翰林版 {lesson.lessonNum}&nbsp;&nbsp;&nbsp;{lesson.lessonName}&nbsp;&nbsp;&nbsp;{lesson.author === '《論語》' ? lesson.author : `作者：${lesson.author}`}
           </h1>
