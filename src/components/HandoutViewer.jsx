@@ -34,41 +34,50 @@ const BlankWord = ({ text, globalShow }) => {
 /* ── 第六課 HTML 表格專用元件 ── */
 const TableContent = ({ html, globalShow }) => {
   const ref = useRef(null);
-  
+  const BLANK_STYLE_HIDDEN = 'color: transparent; background-color: #f1f5f9; padding: 0 4px; border-bottom: 3px solid #94a3b8; user-select: none;';
+  const BLANK_STYLE_SHOW = 'color: #dc2626; background-color: #fef2f2; padding: 0 4px; border-bottom: 3px solid #fca5a5; user-select: none;';
+
+  /* 第一步：用 regex 處理 *...* 填空 */
+  const processedHtml = html.replace(/\*(.*?)\*/g, (_, text) => {
+    return `<span class="table-blank cursor-pointer font-bold transition-colors" style="${BLANK_STYLE_HIDDEN}">${text}</span>`;
+  });
+
+  /* 掛載後：把所有 text-red-600 的 <td> 內容也轉成隱藏填空 */
   useEffect(() => {
     if (!ref.current) return;
-    const blanks = ref.current.querySelectorAll('.table-blank');
-    blanks.forEach(blank => {
+    ref.current.querySelectorAll('td.text-red-600, span.text-red-600').forEach(cell => {
+      if (cell.querySelector('.table-blank')) {
+        // 已有 *..* 填空，只移除父層的紅字 class
+        cell.classList.remove('text-red-600');
+        return;
+      }
+      const content = cell.innerHTML.trim();
+      if (content) {
+        cell.innerHTML = `<span class="table-blank cursor-pointer font-bold transition-colors" style="${BLANK_STYLE_HIDDEN}">${content}</span>`;
+        cell.classList.remove('text-red-600');
+      }
+    });
+  }, []);
+
+  /* globalShow 變化時，統一切換所有填空的可見性 */
+  useEffect(() => {
+    if (!ref.current) return;
+    ref.current.querySelectorAll('.table-blank').forEach(blank => {
       if (globalShow) {
-        blank.style.color = '#dc2626';
-        blank.style.backgroundColor = '#fef2f2';
-        blank.style.borderColor = '#fca5a5';
+        blank.setAttribute('style', BLANK_STYLE_SHOW);
       } else {
-        blank.style.color = 'transparent';
-        blank.style.backgroundColor = '#f1f5f9';
-        blank.style.borderColor = '#94a3b8';
+        blank.setAttribute('style', BLANK_STYLE_HIDDEN);
       }
     });
   }, [globalShow]);
-
-  const processedHtml = html.replace(/\*(.*?)\*/g, (_, text) => {
-    return `<span class="table-blank cursor-pointer font-bold transition-colors" style="color: transparent; background-color: #f1f5f9; padding: 0 4px; border-bottom: 3px solid #94a3b8; user-select: none;">${text}</span>`;
-  });
 
   const handleClick = (e) => {
     if (checkTool()) return;
     const blank = e.target.closest('.table-blank');
     if (blank) {
       e.stopPropagation();
-      if (blank.style.color === 'transparent') {
-        blank.style.color = '#dc2626';
-        blank.style.backgroundColor = '#fef2f2';
-        blank.style.borderColor = '#fca5a5';
-      } else {
-        blank.style.color = 'transparent';
-        blank.style.backgroundColor = '#f1f5f9';
-        blank.style.borderColor = '#94a3b8';
-      }
+      const isHidden = blank.style.color === 'transparent';
+      blank.setAttribute('style', isHidden ? BLANK_STYLE_SHOW : BLANK_STYLE_HIDDEN);
     }
   };
 
@@ -414,12 +423,15 @@ export default function HandoutViewer({ lesson }) {
       <div className="flex-1 w-full p-6 flex justify-center">
         {/* key 含 lesson.id + resetKey，切課或清除答案時強制重建所有子元件 */}
         <div key={`content-${lesson.id}-${resetKey}`} id="printable-area" className="w-full max-w-[850px] bg-white p-10 md:p-16 shadow-xl rounded-xl border border-slate-100 content-area">
-          <h1 className="font-bold text-center mb-12 text-slate-800 whitespace-nowrap overflow-x-auto pb-6 border-b-4 border-slate-300">
-            115六上國語學習講義 翰林版 {lesson.lessonNum}&nbsp;&nbsp;&nbsp;{lesson.lessonName}&nbsp;&nbsp;&nbsp;{lesson.author === '《論語》' ? lesson.author : `作者：${lesson.author}`}
+          <h1 className="font-bold text-center mb-4 text-slate-800 text-2xl">
+            115 五上國語學習講義翰林版 {lesson.lessonNum} {lesson.lessonName} 作者：{lesson.author}
           </h1>
+          <div className="text-center font-bold text-xl mb-12 text-slate-800">
+            班級：_______ 座號：_______ 姓名：_____________
+          </div>
 
           <section className="mb-14">
-            <h2 className="font-bold text-slate-800 text-xl mb-4">任務一文意理解，深入認識課文</h2>
+            <h2 className="font-bold text-slate-800 text-xl mb-4">任務一、文意理解，深入認識課文</h2>
             <div className="mb-8 space-y-2">
               {lesson.task1.map((item, i) => (
                 <div key={i} style={{ marginLeft: `${item.indent * 2}em` }} className="leading-relaxed">
@@ -430,14 +442,14 @@ export default function HandoutViewer({ lesson }) {
           </section>
 
           <section className="mb-14">
-            <h2 className="font-bold text-slate-800 text-xl mb-4 leading-relaxed">任務二閱讀測驗，讀完課文之後，你了解課文內容和作者的想法嗎？<br/>請依據課文回答下面的問題。（在□裡打「✓」）</h2>
+            <h2 className="font-bold text-slate-800 text-xl mb-4 leading-relaxed">任務二、閱讀測驗，讀完課文之後，你了解課文內容和作者的想法嗎？<br/>請依據課文回答下面的問題。（在□裡打「✓」）</h2>
             <div className="space-y-6 mt-6">
               {lesson.quiz.map((q, i) => <QuizBlock key={i} qIdx={i} q={q.q} options={q.options} a={q.a} showAllAnswers={showAllAnswers} />)}
             </div>
           </section>
 
           <section className="mb-14">
-            <h2 className="font-bold text-slate-800 text-xl mb-4">任務三句型練習</h2>
+            <h2 className="font-bold text-slate-800 text-xl mb-4">任務三、句型練習</h2>
             <div className="space-y-8 mt-6">
               {lesson.practices.map((p, i) => <PracticeBlock key={i} index={i} p={p} showAllAnswers={showAllAnswers} />)}
             </div>
@@ -450,7 +462,7 @@ export default function HandoutViewer({ lesson }) {
 
           {lesson.task4 && (
           <section className="mb-10">
-            <h2 className="font-bold text-slate-800 text-xl mb-4">挑戰任務寫作引導，本課文本要點</h2>
+            <h2 className="font-bold text-slate-800 text-xl mb-4">挑戰任務、寫作引導，本課文本要點</h2>
             <div className="mt-6">
               <div className="mb-4 font-bold text-slate-800" style={{ marginLeft: '2em' }}>寫作主題：<span className="font-normal">{lesson.task4.theme}</span></div>
               <div className="mb-6">
