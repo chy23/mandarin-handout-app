@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-family: 'Microsoft JhengHei', 'PingFang TC', sans-serif;
+  }
+}
+
+::selection {
+  background: #b3d4fc;
+}
+
+/* For Handout Viewer */
+.content-area {
+  font-size: 1.5rem;
+  line-height: 1.8;
+}
+
+.print-only {
+  display: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  body {
+    background: white !important;
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+  .content-area {
+    padding: 0 !important;
+    font-size: 12pt !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+}
+
+body.cursor-pen {
+  cursor: text;
+}
+body.cursor-eraser {
+  cursor: cell;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
