@@ -1,10 +1,11 @@
 import React from 'react';
-import { BookOpen, ChevronRight } from 'lucide-react';
+import { BookOpen, ChevronRight, X } from 'lucide-react';
 
-export default function Sidebar({ lessons, currentLessonId, onSelectLesson }) {
+export default function Sidebar({ lessons, currentLessonId, onSelectLesson, isOpen, setIsOpen }) {
+  if (!isOpen) return null;
   return (
-    <div className="w-72 bg-white/60 backdrop-blur-xl border-r border-slate-200 h-screen overflow-y-auto flex flex-col no-print sticky top-0 shadow-lg">
-      <div className="p-6 border-b border-slate-200/50">
+    <div className="w-72 bg-white/60 backdrop-blur-xl border-r border-slate-200 h-screen overflow-y-auto flex flex-col no-print sticky top-0 shadow-lg shrink-0 transition-all">
+      <div className="p-6 border-b border-slate-200/50 flex justify-between items-center relative">
         <div className="flex items-center gap-3">
           <div className="bg-blue-600 text-white p-2 rounded-xl shadow-md shadow-blue-600/20">
             <BookOpen size={24} />
@@ -14,6 +15,9 @@ export default function Sidebar({ lessons, currentLessonId, onSelectLesson }) {
             <p className="text-xs text-slate-500 font-medium mt-0.5">專屬高效學習系統</p>
           </div>
         </div>
+        <button onClick={() => setIsOpen(false)} className="text-slate-400 hover:text-slate-700 bg-slate-100 p-1.5 rounded-full" title="隱藏側邊欄">
+          <X size={18} />
+        </button>
       </div>
       
       <div className="flex-1 p-4 space-y-2">

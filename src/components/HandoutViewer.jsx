@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { PenTool, Eraser, Trash2 } from 'lucide-react';
+import { PenTool, Eraser, Trash2, ZoomIn, ZoomOut, Menu } from 'lucide-react';
 
 const checkTool = () => document.body.classList.contains('cursor-eraser') || document.body.classList.contains('cursor-pen');
 
@@ -227,12 +227,14 @@ const Task4MC = ({ q, options, a, showAllAnswers }) => {
   );
 }
 
-export default function HandoutViewer({ lesson }) {
+export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen }) {
   const [showAllAnswers, setShowAllAnswers] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const [toolMode, setToolMode] = useState('none');
   const [exportSize, setExportSize] = useState('A4');
   const [exportMargin, setExportMargin] = useState('standard');
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [isWidescreen, setIsWidescreen] = useState(false);
 
   /* ── 切換課文時，重置所有答案狀態 ── */
   useEffect(() => {
@@ -404,10 +406,26 @@ export default function HandoutViewer({ lesson }) {
   return (
     <div className="flex flex-col relative w-full h-full pb-20">
       <div className="no-print bg-white/80 backdrop-blur-md border-b border-slate-200 p-4 sticky top-0 z-40 flex flex-col md:flex-row justify-between items-center shadow-sm gap-4">
-        <div className="font-bold text-xl text-blue-900 flex items-center">
+        <div className="font-bold text-xl text-blue-900 flex items-center gap-3">
+          {!isSidebarOpen && (
+            <button onClick={() => setIsSidebarOpen(true)} className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors" title="開啟課程列表">
+              <Menu size={20} />
+            </button>
+          )}
           講義控制台
         </div>
         <div className="flex gap-4 flex-wrap justify-center items-center">
+          {/* Zoom controls */}
+          <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+            <button onClick={() => setZoomLevel(z => Math.max(0.5, z - 0.1))} className="p-1 hover:bg-white rounded text-slate-600" title="縮小"><ZoomOut size={18} /></button>
+            <span className="text-sm font-bold w-12 text-center text-slate-700">{Math.round(zoomLevel * 100)}%</span>
+            <button onClick={() => setZoomLevel(z => Math.min(2, z + 0.1))} className="p-1 hover:bg-white rounded text-slate-600" title="放大"><ZoomIn size={18} /></button>
+          </div>
+          {/* Widescreen toggle */}
+          <button onClick={() => setIsWidescreen(!isWidescreen)} className={`px-3 py-1.5 rounded-lg text-sm font-bold border transition-colors ${isWidescreen ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+            {isWidescreen ? '縮回版面' : '拉寬版面'}
+          </button>
+
           <div className="flex items-center gap-3 bg-slate-100 px-4 py-2 rounded-lg border border-slate-200">
             <label className="text-sm font-bold text-slate-700 flex items-center">版面：<select className="ml-1 border-slate-300 rounded text-sm p-1" value={exportSize} onChange={e => setExportSize(e.target.value)}><option value="A4">A4</option><option value="B4">B4</option><option value="A3">A3</option></select></label>
             <label className="text-sm font-bold text-slate-700 flex items-center">邊界：<select className="ml-1 border-slate-300 rounded text-sm p-1" value={exportMargin} onChange={e => setExportMargin(e.target.value)}><option value="standard">標準</option><option value="wide">寬</option><option value="narrow">窄</option></select></label>
@@ -420,9 +438,14 @@ export default function HandoutViewer({ lesson }) {
         </div>
       </div>
 
-      <div className="flex-1 w-full p-6 flex justify-center">
+      <div className="flex-1 w-full p-6 flex justify-center overflow-auto">
         {/* key 含 lesson.id + resetKey，切課或清除答案時強制重建所有子元件 */}
-        <div key={`content-${lesson.id}-${resetKey}`} id="printable-area" className="w-full max-w-[850px] bg-white p-10 md:p-16 shadow-xl rounded-xl border border-slate-100 content-area">
+        <div 
+          key={`content-${lesson.id}-${resetKey}`} 
+          id="printable-area" 
+          className={`w-full ${isWidescreen ? 'max-w-[1200px]' : 'max-w-[850px]'} bg-white p-10 md:p-16 shadow-xl rounded-xl border border-slate-100 content-area transition-all origin-top`}
+          style={{ transform: `scale(${zoomLevel})`, marginBottom: `${(zoomLevel - 1) * 100}%` }}
+        >
           <h1 className="font-bold text-center mb-4 text-slate-800 text-2xl">
             115 五上國語學習講義翰林版 {lesson.lessonNum} {lesson.lessonName} 作者：{lesson.author}
           </h1>
