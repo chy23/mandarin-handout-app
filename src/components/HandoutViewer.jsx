@@ -408,10 +408,14 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
         <div
           key={`content-${lesson.id}-${resetKey}`}
           id="printable-area"
-          className={`w-full ${isWidescreen ? 'max-w-[1200px]' : 'max-w-[850px]'} bg-white p-10 md:p-16 shadow-xl rounded-xl border border-slate-100 content-area self-start`}
+          className={`relative w-full ${isWidescreen ? 'max-w-[1200px]' : 'max-w-[850px]'} bg-white p-10 md:p-16 shadow-xl rounded-xl border border-slate-100 content-area self-start`}
           style={{ zoom: zoomLevel }}
         >
-          <h1 className="font-bold text-center mb-4 text-slate-800 text-2xl">
+          {/* 浮水印 */}
+          <div className="absolute top-6 right-8 text-slate-300/60 text-sm font-bold select-none tracking-widest no-print">網站建立自楊家驊老師</div>
+          <div className="absolute bottom-6 right-8 text-slate-300/60 text-sm font-bold select-none tracking-widest no-print">網站建立自楊家驊老師</div>
+
+          <h1 className="font-bold text-center mb-4 text-slate-800 text-2xl relative z-10">
             115 五上國語學習講義翰林版 {lesson.lessonNum} {lesson.lessonName} 作者：{lesson.author}
           </h1>
           <div className="text-center font-bold text-xl mb-12 text-slate-800">
