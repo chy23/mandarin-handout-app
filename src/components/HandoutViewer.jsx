@@ -4,12 +4,19 @@ import { PenTool, Eraser, Trash2, ZoomIn, ZoomOut, Menu } from 'lucide-react';
 const checkTool = () => document.body.classList.contains('cursor-eraser') || document.body.classList.contains('cursor-pen');
 
 const BlankWord = ({ text, globalShow }) => {
-  const [localShow, setLocalShow] = useState(false);
-  const isVisible = globalShow || localShow;
+  const [localState, setLocalState] = useState(null);
+  const isVisible = localState !== null ? localState : globalShow;
+  
+  const toggle = (e) => {
+    if (checkTool()) return;
+    e.stopPropagation();
+    setLocalState(!isVisible);
+  };
+
   if (text === '' || text === '　' || text === '✓' || text === '☑️') {
     const isCheck = (text !== '　');
     return (
-      <span onClick={(e) => { if (checkTool()) return; e.stopPropagation(); setLocalShow(!localShow); }}
+      <span onClick={toggle}
         className="cursor-pointer inline-block text-center w-6 data-blankword-check select-none" data-text={isCheck ? '✓' : '　'}>
         <span className={isVisible && isCheck ? 'text-red-600 font-bold' : 'text-transparent'}>
           {isCheck ? '✓' : '　'}
@@ -18,7 +25,7 @@ const BlankWord = ({ text, globalShow }) => {
     );
   }
   return (
-    <span onClick={(e) => { if (checkTool()) return; e.stopPropagation(); setLocalShow(!localShow); }}
+    <span onClick={toggle}
       className={`cursor-pointer px-2 mx-1 font-bold transition-colors select-none border-b-[3px] data-blankword ${isVisible ? 'text-red-600 border-red-300 bg-red-50' : 'text-transparent border-slate-400 bg-slate-100'}`}
       data-text={text}>
       {text}
@@ -29,29 +36,33 @@ const BlankWord = ({ text, globalShow }) => {
 /* ── 第六課 HTML 表格專用元件 ── */
 const TableContent = ({ html, globalShow }) => {
   const ref = useRef(null);
-  const BLANK_STYLE_HIDDEN = 'color: transparent; background-color: #f1f5f9; padding: 0 4px; border-bottom: 3px solid #94a3b8; user-select: none;';
-  const BLANK_STYLE_SHOW = 'color: #dc2626; background-color: #fef2f2; padding: 0 4px; border-bottom: 3px solid #fca5a5; user-select: none;';
 
-  const processedHtml = html.replace(/\*(.*?)\*/g, (_, text) => {
-    return `<span class="table-blank cursor-pointer font-bold transition-colors" style="${BLANK_STYLE_HIDDEN}">${text}</span>`;
-  });
-
-  useEffect(() => {
-    if (!ref.current) return;
-    ref.current.querySelectorAll('td.text-red-600, span.text-red-600').forEach(cell => {
-      if (cell.querySelector('.table-blank')) { cell.classList.remove('text-red-600'); return; }
-      const content = cell.innerHTML.trim();
-      if (content) {
-        cell.innerHTML = `<span class="table-blank cursor-pointer font-bold transition-colors" style="${BLANK_STYLE_HIDDEN}">${content}</span>`;
-        cell.classList.remove('text-red-600');
-      }
+  // 在這階段就把 html 裡的紅字 td 全部轉換掉，避免 re-render 時變回紅字
+  const processedHtml = html
+    .replace(/class="([^"]*)text-red-600([^"]*)"/g, (match, p1, p2) => {
+      // 把 text-red-600 拿掉，避免 td 影響
+      return `class="${p1}${p2}"`;
+    })
+    .replace(/\*(.*?)\*/g, (_, text) => {
+      return `<span class="table-blank cursor-pointer font-bold transition-colors text-transparent bg-slate-100 px-1 border-b-[3px] border-slate-400 select-none">${text}</span>`;
     });
-  }, []);
 
+  // 同步全域顯示狀態，並支援點擊切換
   useEffect(() => {
     if (!ref.current) return;
     ref.current.querySelectorAll('.table-blank').forEach(blank => {
-      blank.setAttribute('style', globalShow ? BLANK_STYLE_SHOW : BLANK_STYLE_HIDDEN);
+      // 判斷該格子是否已經被手動揭開
+      const isRevealed = blank.classList.contains('text-red-600');
+      // 如果 globalShow 為 true，強迫顯示；如果為 false，隱藏 (除非有手動揭開)
+      if (globalShow) {
+        blank.classList.remove('text-transparent', 'bg-slate-100', 'border-slate-400');
+        blank.classList.add('text-red-600', 'bg-red-50', 'border-red-300');
+      } else {
+        if (!isRevealed) {
+          blank.classList.add('text-transparent', 'bg-slate-100', 'border-slate-400');
+          blank.classList.remove('text-red-600', 'bg-red-50', 'border-red-300');
+        }
+      }
     });
   }, [globalShow]);
 
@@ -60,8 +71,14 @@ const TableContent = ({ html, globalShow }) => {
     const blank = e.target.closest('.table-blank');
     if (blank) {
       e.stopPropagation();
-      const isHidden = blank.style.color === 'transparent';
-      blank.setAttribute('style', isHidden ? BLANK_STYLE_SHOW : BLANK_STYLE_HIDDEN);
+      const isHidden = blank.classList.contains('text-transparent');
+      if (isHidden) {
+        blank.classList.remove('text-transparent', 'bg-slate-100', 'border-slate-400');
+        blank.classList.add('text-red-600', 'bg-red-50', 'border-red-300');
+      } else {
+        blank.classList.add('text-transparent', 'bg-slate-100', 'border-slate-400');
+        blank.classList.remove('text-red-600', 'bg-red-50', 'border-red-300');
+      }
     }
   };
 
@@ -91,10 +108,15 @@ const parsePractice = (text, globalShow) => {
 };
 
 const QuizBlock = ({ qIdx, q, options, a, showAllAnswers }) => {
-  const [showLocal, setShowLocal] = useState(false);
-  const isShow = showAllAnswers || showLocal;
+  const [localState, setLocalState] = useState(null);
+  const isShow = localState !== null ? localState : showAllAnswers;
+  
+  const toggle = (e) => {
+    if (checkTool()) return;
+    setLocalState(!isShow);
+  };
   return (
-    <div className="mb-6 cursor-pointer select-none group" onClick={(e) => { if (checkTool()) return; setShowLocal(!showLocal); }}>
+    <div className="mb-6 cursor-pointer select-none group" onClick={toggle}>
       <div className="font-bold text-slate-800 mb-2 group-hover:text-blue-700 transition-colors" style={{ marginLeft: '2em' }}>
         {qIdx + 1}. {q}
       </div>
@@ -116,16 +138,15 @@ const QuizBlock = ({ qIdx, q, options, a, showAllAnswers }) => {
 };
 
 const PracticeBlock = ({ index, p, showAllAnswers }) => {
-  const [showLocal, setShowLocal] = useState(false);
-  const isShow = showAllAnswers || showLocal;
+  // 移除 onClick 以避免「點擊一格跳出多格」的狀況，讓使用者必須準確點擊空格
   return (
-    <div className="mb-6 cursor-pointer select-none group" onClick={(e) => { if (checkTool()) return; setShowLocal(!showLocal); }}>
-      <div className="font-bold text-slate-800 group-hover:text-blue-700 transition-colors" style={{ marginLeft: '2em' }}>
+    <div className="mb-6 select-none group">
+      <div className="font-bold text-slate-800 transition-colors" style={{ marginLeft: '2em' }}>
         例句{['一','二','三','四','五','六'][index]}：<span className="font-normal">{p.ex}</span>
       </div>
       <div className="font-bold text-slate-800 flex mt-1" style={{ marginLeft: '2em' }}>
         <span style={{ whiteSpace: 'pre' }}>{index === 0 ? '　  練習：' : '練習：'}</span>
-        <div className="font-normal text-slate-800">{parsePractice(p.pr, isShow)}</div>
+        <div className="font-normal text-slate-800">{parsePractice(p.pr, showAllAnswers)}</div>
       </div>
     </div>
   );
