@@ -422,7 +422,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
             <h2 className="font-bold text-slate-800 text-xl mb-4">任務一、文意理解，深入認識課文</h2>
             <div className="mb-8 space-y-2">
               {lesson.task1.map((item, i) => (
-                <div key={i} style={{ marginLeft: `${item.indent * 2}em` }} className="leading-relaxed">
+                <div key={i} style={{ marginLeft: `${item.indent * 2}em` }} className={`leading-relaxed ${item.isBox ? 'border-2 border-slate-800 p-4 rounded bg-white my-4 font-bold' : ''}`}>
                   {parseTask1(item.text, showAllAnswers)}
                 </div>
               ))}
