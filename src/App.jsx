@@ -17,14 +17,14 @@ function App() {
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-teal-100/40 blur-3xl" />
       </div>
 
-      <Sidebar 
-        lessons={lessons} 
-        currentLessonId={currentLessonId} 
-        onSelectLesson={setCurrentLessonId} 
+      <Sidebar
+        lessons={lessons}
+        currentLessonId={currentLessonId}
+        onSelectLesson={setCurrentLessonId}
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
       />
-      
+
       <main className="flex-1 h-screen overflow-y-auto relative z-10 no-scrollbar">
         {currentLesson ? (
           <HandoutViewer lesson={currentLesson} isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />

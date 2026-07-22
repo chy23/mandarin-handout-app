@@ -4,8 +4,8 @@ import { BookOpen, ChevronRight, X } from 'lucide-react';
 export default function Sidebar({ lessons, currentLessonId, onSelectLesson, isOpen, setIsOpen }) {
   if (!isOpen) return null;
   return (
-    <div className="w-72 bg-white/60 backdrop-blur-xl border-r border-slate-200 h-screen overflow-y-auto flex flex-col no-print sticky top-0 shadow-lg shrink-0 transition-all">
-      <div className="p-6 border-b border-slate-200/50 flex justify-between items-center relative">
+    <div className="w-72 bg-white/60 backdrop-blur-xl border-r border-slate-200 h-screen overflow-y-auto flex flex-col no-print sticky top-0 shadow-lg shrink-0">
+      <div className="p-6 border-b border-slate-200/50 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <div className="bg-blue-600 text-white p-2 rounded-xl shadow-md shadow-blue-600/20">
             <BookOpen size={24} />
@@ -19,7 +19,7 @@ export default function Sidebar({ lessons, currentLessonId, onSelectLesson, isOp
           <X size={18} />
         </button>
       </div>
-      
+
       <div className="flex-1 p-4 space-y-2">
         <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-2">課程列表</h2>
         {lessons.map((lesson) => {
@@ -29,8 +29,8 @@ export default function Sidebar({ lessons, currentLessonId, onSelectLesson, isOp
               key={lesson.id}
               onClick={() => onSelectLesson(lesson.id)}
               className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 group ${
-                isActive 
-                  ? 'bg-blue-50 border border-blue-100 shadow-sm' 
+                isActive
+                  ? 'bg-blue-50 border border-blue-100 shadow-sm'
                   : 'hover:bg-slate-50 border border-transparent'
               }`}
             >
@@ -42,9 +42,9 @@ export default function Sidebar({ lessons, currentLessonId, onSelectLesson, isOp
                   {lesson.lessonName}
                 </span>
               </div>
-              <ChevronRight 
-                size={16} 
-                className={`transition-transform duration-200 ${isActive ? 'text-blue-600 translate-x-1' : 'text-slate-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2'}`} 
+              <ChevronRight
+                size={16}
+                className={`transition-transform duration-200 ${isActive ? 'text-blue-600 translate-x-1' : 'text-slate-300 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-2'}`}
               />
             </button>
           );
