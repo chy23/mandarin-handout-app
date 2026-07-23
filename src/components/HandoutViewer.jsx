@@ -373,7 +373,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
     let sizeCss = '21cm 29.7cm';
     if (exportSize === 'B4') sizeCss = '25.7cm 36.4cm';
     if (exportSize === 'A3') sizeCss = '29.7cm 42cm';
-    let marginCss = '2.54cm 2.54cm 2.54cm 2.54cm';
+    let marginCss = '2.54cm 3.18cm 2.54cm 3.18cm';
     if (exportMargin === 'wide') marginCss = '2.54cm 5.08cm 2.54cm 5.08cm';
     if (exportMargin === 'narrow') marginCss = '1.27cm 1.27cm 1.27cm 1.27cm';
 
