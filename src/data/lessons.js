@@ -420,7 +420,7 @@ export const lessons = [
     "id": "lesson-3",
     "lessonNum": "第三課",
     "lessonName": "孔子說的話",
-    "author": "佚名",
+    "author": "孔子的學生們《論語》",
     "task1": [
       {
         "indent": 1,
@@ -800,7 +800,7 @@ export const lessons = [
     "id": "lesson-5",
     "lessonNum": "第五課",
     "lessonName": "樹的聯想",
-    "author": "佚名",
+    "author": "宋晶宜",
     "task1": [
       {
         "indent": 1,
@@ -1017,7 +1017,7 @@ export const lessons = [
     "id": "lesson-6",
     "lessonNum": "第六課",
     "lessonName": "善用自嘲，展現幽默",
-    "author": "佚名",
+    "author": "陳靜婷",
     "task1": [
       {
         "indent": 1,
