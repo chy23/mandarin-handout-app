@@ -278,7 +278,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
     });
   };
 
-  const exportToWord = (mode) => {
+  const exportToWord = (mode, showWatermark = true) => {
     const clone = document.getElementById('printable-area').cloneNode(true);
     clone.querySelectorAll('.no-print').forEach(el => el.remove());
 
@@ -343,6 +343,33 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
       });
     }
 
+    // 浮水印 CSS
+    const watermarkStyle = `
+      .watermark-wrap {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      .watermark-text {
+        font-size: 87pt;
+        font-weight: bold;
+        font-style: italic;
+        color: #808080;
+        opacity: 0.25;
+        transform: rotate(-35deg);
+        white-space: nowrap;
+        font-family: "標楷體", "BiauKai", serif;
+        user-select: none;
+      }
+    `;
+    const watermarkHtml = showWatermark
+      ? `<div class="watermark-wrap"><span class="watermark-text">彙整自楊家駒老師</span></div>`
+      : '';
+
     let sizeCss = '21cm 29.7cm';
     if (exportSize === 'B4') sizeCss = '25.7cm 36.4cm';
     if (exportSize === 'A3') sizeCss = '29.7cm 42cm';
@@ -363,9 +390,10 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
         h2 { font-size: 14pt !important; font-weight: bold; margin-top: 24px; margin-bottom: 12px; }
         table { border-collapse: collapse; width: 100%; }
         td, th { border: 1px solid #94a3b8; padding: 6px 8px; }
+        ${showWatermark ? watermarkStyle : ''}
       </style>
     </head>
-    <body><div class="WordSection1">${clone.innerHTML}</div></body>
+    <body>${watermarkHtml}<div class="WordSection1">${clone.innerHTML}</div></body>
     </html>`;
 
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
@@ -419,8 +447,8 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
           <button onClick={toggleShowAll} className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm">
             {showAllAnswers ? '🔒 隱藏全解答' : '👁️ 顯示全解答'}
           </button>
-          <button onClick={() => exportToWord('teacher')} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出教用版</button>
-          <button onClick={() => exportToWord('student')} className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出學用版</button>
+          <button onClick={() => handleExport('teacher')} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出教用版</button>
+          <button onClick={() => handleExport('student')} className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出學用版</button>
         </div>
       </div>
 
