@@ -367,7 +367,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
       }
     `;
     const watermarkHtml = showWatermark
-      ? `<div class="watermark-wrap"><span class="watermark-text">彙整自楊家駒老師</span></div>`
+      ? `<div class="watermark-wrap"><span class="watermark-text">彙整自楊家驊老師</span></div>`
       : '';
 
     let sizeCss = '21cm 29.7cm';
@@ -406,7 +406,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
 
   // 匯出按鈕：詢問密碼，@6912 去除浮水印，否則保留浮水印
   const handleExport = (mode) => {
-    const pwd = window.prompt('輸入密碼可移除浮水印（直接按確定則保留浮水印）：');
+    const pwd = window.prompt('輸入密碼可移除浮水印\n（無密碼也可以直接按確定下載，會以浮水印模式呈現）：');
     const showWatermark = (pwd !== '@6912');
     exportToWord(mode, showWatermark);
   };
