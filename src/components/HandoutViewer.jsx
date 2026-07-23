@@ -374,7 +374,8 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `講義_${lesson.lessonNum}_${mode === 'teacher' ? '教用' : '學用'}.doc`;
+    const lessonNumber = lesson.id.replace('lesson-', '').padStart(2, '0');
+    link.download = `${lessonNumber}${lesson.lessonNum}課堂單_${lesson.lessonName}_${mode === 'teacher' ? '教用版' : '學用版'}.doc`;
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
