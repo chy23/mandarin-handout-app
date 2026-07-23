@@ -343,31 +343,26 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
       });
     }
 
-    // 浮水印 CSS
-    const watermarkStyle = `
-      .watermark-wrap {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        pointer-events: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-      }
-      .watermark-text {
-        font-size: 87pt;
-        font-weight: bold;
-        font-style: italic;
-        color: #808080;
-        opacity: 0.25;
-        transform: rotate(-35deg);
-        white-space: nowrap;
-        font-family: "標楷體", "BiauKai", serif;
-        user-select: none;
-      }
-    `;
     const watermarkHtml = showWatermark
-      ? `<div class="watermark-wrap"><span class="watermark-text">彙整自楊家驊老師</span></div>`
+      ? `
+<div style="mso-element:header" id="h1">
+  <p class="MsoHeader" style="text-align:center; margin:0;">
+    <span style="position:absolute; margin-top:350px; left:0; width:100%; font-size:87pt; font-weight:bold; font-style:italic; color:#808080; opacity:0.25; font-family:'標楷體',serif; z-index:-1; text-align:center;">
+      <!--[if gte vml 1]>
+      <v:shapetype id="_x0000_t136" coordsize="21600,21600" o:spt="136" adj="10800" path="m@7,l@8,m@5,21600l@6,21600e">
+        <v:path textpathok="t" o:connecttype="custom" o:connectlocs="10800,@9;0,10800;10800,@10;21600,10800" o:connectangles="270,180,90,0"/>
+        <v:textpath on="t" fitshape="t"/>
+        <o:lock v:ext="edit" text="t" shapetype="t"/>
+      </v:shapetype>
+      <v:shape id="WaterMarkObject" type="#_x0000_t136" style="position:absolute;margin-left:0;margin-top:0;width:500pt;height:120pt;rotation:315;z-index:-251657216;mso-position-horizontal:center;mso-position-vertical:center" fillcolor="#808080" stroked="f">
+        <v:fill opacity=".25"/>
+        <v:textpath style="font-family:'標楷體';font-size:87pt;font-style:italic;font-weight:bold" string="彙整自楊家驊老師"/>
+      </v:shape>
+      <![endif]-->
+      <span style="display:inline-block; transform:rotate(-35deg); mso-hide:all;">彙整自楊家驊老師</span>
+    </span>
+  </p>
+</div>`
       : '';
 
     let sizeCss = '21cm 29.7cm';
@@ -378,22 +373,25 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
     if (exportMargin === 'narrow') marginCss = '1.27cm 1.27cm 1.27cm 1.27cm';
 
     const html = `
-    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <html xmlns:v='urn:schemas-microsoft-com:vml' xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
     <head>
       <meta charset="utf-8">
       <style>
-        @page WordSection1 { size: ${sizeCss}; margin: ${marginCss}; }
+        @page WordSection1 { size: ${sizeCss}; margin: ${marginCss}; ${showWatermark ? 'mso-header: h1;' : ''} }
         div.WordSection1 { page: WordSection1; }
+        p.MsoHeader { margin: 0; text-align: center; }
         body, p, span, div, li, ul, h1, h2, h3, h4 { font-family: "標楷體", "BiauKai", "DFKai-SB", serif !important; line-height: 1.5 !important; }
         body { font-size: 12pt !important; color: #000; }
         h1 { font-size: 16pt !important; font-weight: bold; text-align: center; margin-bottom: 24px; }
         h2 { font-size: 14pt !important; font-weight: bold; margin-top: 24px; margin-bottom: 12px; }
         table { border-collapse: collapse; width: 100%; }
         td, th { border: 1px solid #94a3b8; padding: 6px 8px; }
-        ${showWatermark ? watermarkStyle : ''}
       </style>
     </head>
-    <body>${watermarkHtml}<div class="WordSection1">${clone.innerHTML}</div></body>
+    <body>
+      <div class="WordSection1">${clone.innerHTML}</div>
+      ${watermarkHtml}
+    </body>
     </html>`;
 
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
