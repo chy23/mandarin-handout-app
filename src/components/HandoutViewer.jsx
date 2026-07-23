@@ -343,24 +343,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
       });
     }
 
-    const watermarkHtml = showWatermark
-      ? `
-<div style="mso-element:header" id="h1">
-  <p class="MsoHeader" style="text-align:center; margin:0;">
-    <!--[if gte vml 1]>
-    <v:shapetype id="_x0000_t136" coordsize="21600,21600" o:spt="136" adj="10800" path="m@7,l@8,m@5,21600l@6,21600e">
-      <v:path textpathok="t" o:connecttype="custom" o:connectlocs="10800,@9;0,10800;10800,@10;21600,10800" o:connectangles="270,180,90,0"/>
-      <v:textpath on="t" fitshape="t"/>
-      <o:lock v:ext="edit" text="t" shapetype="t"/>
-    </v:shapetype>
-    <v:shape id="PowerPlusWaterMarkObject" type="#_x0000_t136" style="position:absolute;margin-left:0;margin-top:200pt;width:550pt;height:150pt;rotation:315;z-index:-251657216;mso-position-horizontal:center;mso-position-vertical:center" fillcolor="#808080" stroked="f">
-      <v:fill opacity=".25"/>
-      <v:textpath style="font-family:'標楷體';font-size:87pt;font-style:italic;font-weight:bold" string="彙整自楊家驊老師"/>
-    </v:shape>
-    <![endif]-->
-  </p>
-</div>`
-      : '';
+
 
     let sizeCss = '21cm 29.7cm';
     if (exportSize === 'B4') sizeCss = '25.7cm 36.4cm';
@@ -370,13 +353,12 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
     if (exportMargin === 'narrow') marginCss = '1.27cm 1.27cm 1.27cm 1.27cm';
 
     const html = `
-    <html xmlns:v='urn:schemas-microsoft-com:vml' xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+    <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
     <head>
       <meta charset="utf-8">
       <style>
-        @page WordSection1 { size: ${sizeCss}; margin: ${marginCss}; ${showWatermark ? 'mso-header: h1;' : ''} }
+        @page WordSection1 { size: ${sizeCss}; margin: ${marginCss}; }
         div.WordSection1 { page: WordSection1; }
-        p.MsoHeader { margin: 0; text-align: center; }
         body, p, span, div, li, ul, h1, h2, h3, h4 { font-family: "標楷體", "BiauKai", "DFKai-SB", serif !important; line-height: 1.5 !important; }
         body { font-size: 12pt !important; color: #000; }
         h1 { font-size: 16pt !important; font-weight: bold; text-align: center; margin-bottom: 24px; }
@@ -385,10 +367,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
         td, th { border: 1px solid #94a3b8; padding: 6px 8px; }
       </style>
     </head>
-    <body>
-      <div class="WordSection1">${clone.innerHTML}</div>
-      ${watermarkHtml}
-    </body>
+    <body><div class="WordSection1">${clone.innerHTML}</div></body>
     </html>`;
 
     const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
@@ -399,12 +378,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
-  // 匯出按鈕：詢問密碼，@6912 去除浮水印，否則保留浮水印
-  const handleExport = (mode) => {
-    const pwd = window.prompt('輸入密碼可移除浮水印\n（無密碼也可以直接按確定下載，會以浮水印模式呈現）：');
-    const showWatermark = (pwd !== '@6912');
-    exportToWord(mode, showWatermark);
-  };
+
 
   if (!lesson) {
     return <div className="p-10 text-center text-slate-500">請從左側選擇一份課文</div>;
@@ -449,8 +423,8 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
           <button onClick={toggleShowAll} className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-lg font-bold shadow-sm transition-colors text-sm">
             {showAllAnswers ? '🔒 隱藏全解答' : '👁️ 顯示全解答'}
           </button>
-          <button onClick={() => handleExport('teacher')} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出教用版</button>
-          <button onClick={() => handleExport('student')} className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出學用版</button>
+          <button onClick={() => exportToWord('teacher')} className="bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出教用版</button>
+          <button onClick={() => exportToWord('student')} className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg shadow font-bold text-sm">匯出學用版</button>
         </div>
       </div>
 
