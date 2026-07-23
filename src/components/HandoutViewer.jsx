@@ -404,6 +404,13 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
     document.body.appendChild(link); link.click(); document.body.removeChild(link);
   };
 
+  // 匯出按鈕：詢問密碼，@6912 去除浮水印，否則保留浮水印
+  const handleExport = (mode) => {
+    const pwd = window.prompt('輸入密碼可移除浮水印（直接按確定則保留浮水印）：');
+    const showWatermark = (pwd !== '@6912');
+    exportToWord(mode, showWatermark);
+  };
+
   if (!lesson) {
     return <div className="p-10 text-center text-slate-500">請從左側選擇一份課文</div>;
   }
