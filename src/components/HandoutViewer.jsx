@@ -347,9 +347,17 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
       ? `
 <div style="mso-element:header" id="h1">
   <p class="MsoHeader" style="text-align:center; margin:0;">
-    <span style="position:absolute; margin-top:350px; left:0; width:100%; font-size:87pt; font-weight:bold; font-style:italic; color:#808080; opacity:0.25; font-family:'標楷體',serif; z-index:-1; text-align:center;">
-      <span style="display:inline-block; transform:rotate(-35deg);">彙整自楊家驊老師</span>
-    </span>
+    <!--[if gte vml 1]>
+    <v:shapetype id="_x0000_t136" coordsize="21600,21600" o:spt="136" adj="10800" path="m@7,l@8,m@5,21600l@6,21600e">
+      <v:path textpathok="t" o:connecttype="custom" o:connectlocs="10800,@9;0,10800;10800,@10;21600,10800" o:connectangles="270,180,90,0"/>
+      <v:textpath on="t" fitshape="t"/>
+      <o:lock v:ext="edit" text="t" shapetype="t"/>
+    </v:shapetype>
+    <v:shape id="PowerPlusWaterMarkObject" type="#_x0000_t136" style="position:absolute;margin-left:0;margin-top:200pt;width:550pt;height:150pt;rotation:315;z-index:-251657216;mso-position-horizontal:center;mso-position-vertical:center" fillcolor="#808080" stroked="f">
+      <v:fill opacity=".25"/>
+      <v:textpath style="font-family:'標楷體';font-size:87pt;font-style:italic;font-weight:bold" string="彙整自楊家驊老師"/>
+    </v:shape>
+    <![endif]-->
   </p>
 </div>`
       : '';
