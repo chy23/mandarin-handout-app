@@ -399,7 +399,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
         </div>
         <div className="flex gap-3 flex-wrap justify-center items-center">
           {/* 版權註記 */}
-          <div className="text-[11px] text-slate-400 text-right leading-tight mr-1 hidden md:block">
+          <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 p-1.5 rounded text-right leading-tight mr-1 hidden md:block">
             學習單資料取自「翰林出版社」<br/>
             網站內容僅限用於孩子學習使用<br/>
             切勿用於商業行為
