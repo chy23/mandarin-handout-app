@@ -398,6 +398,12 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
           講義控制台
         </div>
         <div className="flex gap-3 flex-wrap justify-center items-center">
+          {/* 版權註記 */}
+          <div className="text-[11px] text-slate-400 text-right leading-tight mr-1 hidden md:block">
+            學習單資料取自「翰林出版社」<br/>
+            網站內容僅限用於孩子學習使用<br/>
+            切勿用於商業行為
+          </div>
           {/* 縮放 */}
           <div className="flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
             <button onClick={() => setZoomLevel(z => Math.max(0.5, parseFloat((z - 0.1).toFixed(1))))} className="p-1 hover:bg-white rounded text-slate-600" title="縮小"><ZoomOut size={18} /></button>
