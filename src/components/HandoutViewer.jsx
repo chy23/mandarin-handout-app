@@ -402,7 +402,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
           <div className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 p-1.5 rounded text-right leading-tight mr-1 hidden md:block">
             學習單資料取自「翰林出版社」<br/>
             網站內容僅限用於孩子學習使用<br/>
-            切勿用於商業行為
+            <span className="text-red-600 font-bold">切勿用於商業行為</span>
           </div>
           {/* 縮放 */}
           <div className="flex items-center gap-1 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
