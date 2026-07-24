@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import HandoutViewer from './components/HandoutViewer';
-import { lessons } from './data/lessons';
+import { lessons as allLessons } from './data/lessons';
+const lessons = allLessons.slice(0, 1);
 
 function App() {
   const [currentLessonId, setCurrentLessonId] = useState(lessons[0]?.id);
