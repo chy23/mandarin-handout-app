@@ -43,7 +43,7 @@ for i in range(1, 7):
     # 1. 修改 vite.config.js 的 base 路徑
     with open("vite.config.js", "r") as f:
         v = f.read()
-    v = re.sub(r"base:\s*'/mandarin-handout-app/.*?',", f"base: '/mandarin-handout-app/{branch}/',", v)
+    v = re.sub(r"base:\s*'/HLZHTW-1151ClassWS/.*?',", f"base: '/HLZHTW-1151ClassWS/{branch}/',", v)
     with open("vite.config.js", "w") as f:
         f.write(v)
 
