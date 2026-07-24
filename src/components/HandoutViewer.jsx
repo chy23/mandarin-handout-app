@@ -395,7 +395,7 @@ export default function HandoutViewer({ lesson, isSidebarOpen, setIsSidebarOpen 
               <Menu size={20} />
             </button>
           )}
-          講義控制台
+          國語課堂學習單
         </div>
         <div className="flex gap-3 flex-wrap justify-center items-center">
           {/* 版權註記 */}

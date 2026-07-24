@@ -11,7 +11,7 @@ export default function Sidebar({ lessons, currentLessonId, onSelectLesson, isOp
             <BookOpen size={24} />
           </div>
           <div>
-            <h1 className="text-xl font-extrabold text-slate-800 tracking-tight">國語講義平台</h1>
+            <h1 className="text-xl font-extrabold text-slate-800 tracking-tight">國語學習單平台</h1>
             <p className="text-xs text-slate-500 font-medium mt-0.5">專屬高效學習系統</p>
           </div>
         </div>
